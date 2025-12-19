@@ -31,8 +31,6 @@ def BS_dirichlet(S, dS, sigma, r):
 
     return M
 
-    return LHS, RHS, r
-
 
 if __name__ == "__main__":
     sigma = 0.3
