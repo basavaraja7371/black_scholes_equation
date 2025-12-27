@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.sparse import diags
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 def BS_dirichlet(S, dS, sigma, r):
@@ -14,7 +14,7 @@ def BS_dirichlet(S, dS, sigma, r):
         r (float): risk free rate
 
     Returns:
-        M(np.ndarray): Black-Scholes Matrix
+        A (np.ndarray): Black-Scholes Matrix
     """
 
     # diagonal elements
@@ -28,9 +28,9 @@ def BS_dirichlet(S, dS, sigma, r):
 
     offsets = [-1, 0, 1]
 
-    M = diags(diagonals=diagonals, offsets=offsets, shape=(n, n)).toarray()
+    A = diags(diagonals=diagonals, offsets=offsets, shape=(n, n)).toarray()
 
-    return M
+    return A
 
 
 def bs_boundary_vector(dt, S, sigma, r, V0_n, V0_np1, VL_n, VL_np1):
@@ -60,6 +60,28 @@ def bs_boundary_vector(dt, S, sigma, r, V0_n, V0_np1, VL_n, VL_np1):
     g[0] += 0.5 * dt * g0 * (V0_n + V0_np1)
     g[-1] += 0.5 * dt * gL * (VL_n + VL_np1)
     return g
+
+
+def crank_nicolson_step(Vn, A, b):
+    """
+    Crank-Nicolson step to calculate V[n+1] from V[n]
+
+    Args:
+        Vn (np.array): option price at t[n]
+        A (np.ndarray): The matrix A
+        b (np.array): bounday vector
+
+    Returns:
+        Vn_p1 (np.array): option price at t[n+1]
+    """
+    n = A.shape[0]
+    Ix = np.eye(n)
+    LHS = Ix - A
+    RHS = Ix + A
+
+    rhs = RHS @ Vn + b
+    Vn_p1 = np.linalg.solve(LHS, rhs)
+    return Vn_p1
 
 
 if __name__ == "__main__":
