@@ -86,6 +86,24 @@ def crank_nicolson_step(Vn, A, b, dt):
 
 
 def solve_bs(f, g0, gL, S_max, T, nS, nt, sigma, r):
+    """
+    Solves the BS equation using CN method
+
+    Args:
+        f (function): Initial condition
+        g0 (function): LHS boundary condition
+        gL (function): RHS boundary condition
+        S_max (float): Upper limit of the Stock price
+        T (float): Expiration
+        nS (int): Number of stock price grid
+        nt (int): Number of time steps
+        sigma (float): Volatility
+        r (float): Risk free rate
+
+    Returns:
+        S (np.array): Stock price array
+        V (np.array): option price array
+    """
     dS = S_max / (nS - 1)
     dt = T / nt
 
@@ -93,9 +111,8 @@ def solve_bs(f, g0, gL, S_max, T, nS, nt, sigma, r):
     t = np.linspace(0, T, nt + 1)
 
     V = np.zeros(nS - 2)
-    # V[0] = g0(0)
-    # V[-1] = gL(0)
-    # V[1:-1] = f(S)[1:-1]
+
+    # initial condition
     V = f(S)[1:-1]
 
     A = BS_dirichlet(S, dS, sigma, r)
@@ -105,7 +122,6 @@ def solve_bs(f, g0, gL, S_max, T, nS, nt, sigma, r):
             dt, S, sigma, r, g0(t[n]), g0(t[n + 1]), gL(t[n]), gL(t[n + 1])
         )
 
-        # V[1:-1] = crank_nicolson_step(V[1:-1], A, g, dt)
         V = crank_nicolson_step(V, A, g, dt)
 
     return S[1:-1], V
@@ -113,27 +129,18 @@ def solve_bs(f, g0, gL, S_max, T, nS, nt, sigma, r):
 
 def bs_call_analytical(S, t, T, K, r, sigma):
     """
-    Analytical Black–Scholes price of a European call option.
+    Analytical solution for the Black-Scholes call price
 
-    Parameters
-    ----------
-    S : np.ndarray or float
-        Stock price(s)
-    t : float
-        Current time
-    T : float
-        Maturity
-    K : float
-        Strike price
-    r : float
-        Risk-free rate
-    sigma : float
-        Volatility
+    Args:
+        S (np.array): Stock price grid
+        t (float): Current time/ date
+        T (float): Expiration date / Maturity
+        K (float): Strike price
+        r (float): Risk free rate
+        sigma (float): Volatility
 
-    Returns
-    -------
-    V : np.ndarray or float
-        Option value(s)
+    Returns:
+        V (np.array): Option price
     """
     tau = T - t
 
