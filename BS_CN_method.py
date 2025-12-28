@@ -110,6 +110,7 @@ def solve_bs(f, g0, gL, S_max, T, nS, nt, sigma, r):
     S = np.linspace(0, S_max, nS)
     t = np.linspace(0, T, nt + 1)
 
+    # Only for interior points
     V = np.zeros(nS - 2)
 
     # initial condition
@@ -117,6 +118,7 @@ def solve_bs(f, g0, gL, S_max, T, nS, nt, sigma, r):
 
     A = BS_dirichlet(S, dS, sigma, r)
 
+    # Time march
     for n in range(nt):
         g = bs_boundary_vector(
             dt, S, sigma, r, g0(t[n]), g0(t[n + 1]), gL(t[n]), gL(t[n + 1])
@@ -127,7 +129,7 @@ def solve_bs(f, g0, gL, S_max, T, nS, nt, sigma, r):
     return S[1:-1], V
 
 
-def bs_call_analytical(S, t, T, K, r, sigma):
+def bs_analytical(S, t, T, K, r, sigma, option="call"):
     """
     Analytical solution for the Black-Scholes call price
 
@@ -138,63 +140,110 @@ def bs_call_analytical(S, t, T, K, r, sigma):
         K (float): Strike price
         r (float): Risk free rate
         sigma (float): Volatility
+        option (str): call or put
 
     Returns:
         V (np.array): Option price
     """
     tau = T - t
 
-    # Handle maturity exactly
+    # Payoff at maturity
     if tau <= 0:
-        return np.maximum(S - K, 0.0)
+        if option.lower() == "call":
+            return np.maximum(S - K, 0.0)
+        elif option.lower() == "put":
+            return np.maximum(K - S, 0.0)
+        else:
+            raise ValueError("option must be 'call' or 'put'")
 
     d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * tau) / (sigma * np.sqrt(tau))
     d2 = d1 - sigma * np.sqrt(tau)
 
-    V = S * norm.cdf(d1) - K * np.exp(-r * tau) * norm.cdf(d2)
+    if option.lower() == "call":
+        V = S * norm.cdf(d1) - K * np.exp(-r * tau) * norm.cdf(d2)
+
+    elif option.lower() == "put":
+        V = K * np.exp(-r * tau) * norm.cdf(-d2) - S * norm.cdf(-d1)
+
+    else:
+        raise ValueError("option must be 'call' or 'put'")
+
     return V
 
 
 if __name__ == "__main__":
-    # def exact_solution(x, t, alpha):
-    #     return np.exp(-(np.pi**2) * alpha * t) * np.sin(np.pi * x)
-
     # Initial condition
-    def f(S):
+    def f_call(S):
         global K
         return np.maximum(S - K, 0)
 
+    def f_put(S):
+        global K
+        return np.maximum(K - S, 0)
+
     # Right boundary
-    def gL(t):
+    def gL_call(t):
         global S_max
         global r
         global K
         return S_max - K * np.exp(-r * t)
 
+    def gL_put(t):
+        global S_max
+        global r
+        global K
+        return 0
+
     # Left boundary
-    def g0(t):
+    def g0_call(t):
         return 0.0
 
-    T = 0.5
-    nS = 100
-    nt = 100
-    sigma = 0.3
-    r = 0.05
-    K = 100
+    def g0_put(t):
+        return K * np.exp(-r * t)
+
+    # Parameters
+    T = 1
+    nS = 50
+    nt = 500
+    sigma = 0.1
+    r = 0.01
+    K = 90
     S_max = 2 * K
 
-    S, V_final = solve_bs(f, g0, gL, S_max, T, nS, nt, sigma, r)
+    S_call, V_call_final = solve_bs(
+        f_call, g0_call, gL_call, S_max, T, nS, nt, sigma, r
+    )
+    V_call_exact = bs_analytical(
+        S=S_call, t=0, T=T, K=K, r=r, sigma=sigma, option="call"
+    )
 
-    V_exact = bs_call_analytical(S=S, t=0, T=T, K=K, r=r, sigma=sigma)
+    S_put, V_put_final = solve_bs(f_put, g0_put, gL_put, S_max, T, nS, nt, sigma, r)
+    V_put_exact = bs_analytical(S=S_put, t=0, T=T, K=K, r=r, sigma=sigma, option="put")
 
-    fig, ax = plt.subplots(figsize=(9, 5))
-    ax.set_xlabel(r"Stock Price, $S$", fontsize=18)
-    ax.set_ylabel(r"Option price, $V$", fontsize=18)
+    fig, axs = plt.subplots(2, 1, figsize=(7, 7))
+    ax0, ax1 = axs.flatten()
 
-    ax.plot(S, V_final, linewidth=2, label="Crank-Nicolson")
-    ax.plot(S, V_exact, "rs", markersize=5, alpha=0.7, label="Exact")
+    ax0.set_xlabel(r"Stock Price, $S$", fontsize=18)
+    ax0.set_ylabel(r"Call option price, $V_c$", fontsize=18)
 
-    ax.legend(fontsize=12)
+    ax0.plot(S_call, V_call_final, linewidth=2, label="Crank-Nicolson")
+    ax0.plot(S_call, V_call_exact, "r^", markersize=5, alpha=0.7, label="Exact")
+    ax0.set_title(
+        f"Call option, $\\sigma={sigma}$, K={K}, $r={r}$ and $T={T}$", fontsize=16
+    )
+    ax0.set_xlim(0, S_max)
+
+    ax1.set_xlabel(r"Stock Price, $S$", fontsize=18)
+    ax1.set_ylabel(r"Put option price, $V_p$", fontsize=18)
+
+    ax1.plot(S_put, V_put_final, linewidth=2, label="Crank-Nicolson")
+    ax1.plot(S_put, V_put_exact, "r^", markersize=5, alpha=0.7, label="Exact")
+    ax1.set_title(
+        f"Put option, $\\sigma={sigma}$, K={K}, $r={r}$ and $T={T}$", fontsize=16
+    )
+    ax1.set_xlim(0, S_max)
+
+    ax1.legend(fontsize=12)
     plt.tight_layout()
-    # plt.savefig("heat_equation_CN.jpg")
+    plt.savefig("BS_equation_CN.jpg")
     plt.show()
