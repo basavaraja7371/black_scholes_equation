@@ -114,6 +114,7 @@ If
 $$\frac{\partial V}{\partial t} = F(t, S, V_s, V_{ss})$$
 
 then CN method gives,
+
 $$
 \frac{V_i^{n+1} - V_i^n}{\Delta \tau} = 
 \frac{1}{2} \ (F^{n+1} + F^{n})
@@ -210,7 +211,7 @@ $$
 
 ---
 
-## 9. Boundary Vector $ \mathbf{b} $
+## 9. Boundary Vector $\mathbf{b}$
 
 Boundary conditions introduce additional terms:
 
@@ -246,9 +247,7 @@ All interior components are zero.
    - Assemble boundary vector $\mathbf{b}$
    - Solve
 
-     $$
-     (I - A)\mathbf{V}^{n+1} = (I + A)\mathbf{V}^n + \mathbf{b}
-     $$
+     $$(I - A)\mathbf{V}^{n+1} = (I + A)\mathbf{V}^n + \mathbf{b}$$
 
 3. Reconstruct full solution including boundaries
 
