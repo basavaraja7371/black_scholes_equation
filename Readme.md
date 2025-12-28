@@ -6,10 +6,10 @@
 The Black–Scholes PDE for an option price $V(S,t)$ is
 
 $$
-\frac{\partial V}{\partial t} =
--\frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2}
-- rS \frac{\partial V}{\partial S}
-+ rV,
+\frac{\partial V}{\partial t} = -
+\frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} - 
+rS \frac{\partial V}{\partial S} + 
+rV,
 \quad t \in [0,T]
 $$
 
@@ -22,10 +22,10 @@ $$
 Then the PDE becomes
 
 $$
-\frac{\partial V}{\partial \tau}
-= \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2}
-+ rS \frac{\partial V}{\partial S}
-- rV
+\frac{\partial V}{\partial \tau} = 
+\frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} + 
+rS \frac{\partial V}{\partial S} - 
+rV
 $$
 
 We now evolve **forward in $\tau$** from $0 \to T$.
@@ -113,19 +113,19 @@ $$\frac{\partial V}{\partial t} = F(t, S, V_s, V_{ss})$$
 
 then CN method gives,
 $$
-\frac{V_i^{n+1} - V_i^n}{\Delta \tau}
-= \frac{1}{2} \ (F^{n+1} + F^{n})
+\frac{V_i^{n+1} - V_i^n}{\Delta \tau} = 
+\frac{1}{2} \ (F^{n+1} + F^{n})
 $$
 
 Substituting finite differences yields
 
 $$
-\frac{V_i^{n+1} - V_i^n}{\Delta \tau}
-= \frac{1}{2}
+\frac{V_i^{n+1} - V_i^n}{\Delta \tau} = 
+\frac{1}{2}
 \Big[
-a_i (V_{i-1}^{n+1} + V_{i-1}^n)
-+ b_i (V_i^{n+1} + V_i^n)
-+ c_i (V_{i+1}^{n+1} + V_{i+1}^n)
+a_i (V_{i-1}^{n+1} + V_{i-1}^n) + 
+b_i (V_i^{n+1} + V_i^n) + 
+c_i (V_{i+1}^{n+1} + V_{i+1}^n)
 \Big]
 $$
 
@@ -134,21 +134,19 @@ $$
 ## 5. Coefficients $a_i, b_i, c_i$
 
 $$
-a_i
-= \frac{1}{2}\frac{\sigma^2 S_i^2}{\Delta S^2}
-- \frac{rS_i}{2\Delta S}
+a_i = 
+\frac{1}{2}\frac{\sigma^2 S_i^2}{\Delta S^2} - 
+\frac{rS_i}{2\Delta S}
 $$
 
 $$
-b_i
-= -\frac{\sigma^2 S_i^2}{\Delta S^2}
-- r
+b_i = -\frac{\sigma^2 S_i^2}{\Delta S^2} - r
 $$
 
 $$
-c_i
-= \frac{1}{2}\frac{\sigma^2 S_i^2}{\Delta S^2}
-+ \frac{rS_i}{2\Delta S}
+c_i = 
+\frac{1}{2}\frac{\sigma^2 S_i^2}{\Delta S^2} + 
+\frac{rS_i}{2\Delta S}
 $$
 
 ---
@@ -158,20 +156,18 @@ $$
 Multiply both sides by $\Delta \tau$ and rearrange:
 
 $$
-V_i^{n+1}
-- \frac{\Delta \tau}{2}
+V_i^{n+1} - \frac{\Delta \tau}{2}
 \left(
-a_i V_{i-1}^{n+1}
-+ b_i V_i^{n+1}
-+ c_i V_{i+1}^{n+1}
-\right)
-=
-V_i^n
-+ \frac{\Delta \tau}{2}
+a_i V_{i-1}^{n+1} + 
+b_i V_i^{n+1} + 
+c_i V_{i+1}^{n+1}
+\right) =
+V_i^n + 
+\frac{\Delta \tau}{2}
 \left(
-a_i V_{i-1}^n
-+ b_i V_i^n
-+ c_i V_{i+1}^n
+a_i V_{i-1}^n + 
+b_i V_i^n + 
+c_i V_{i+1}^n
 \right)
 $$
 
@@ -204,9 +200,9 @@ $$
 
 $$
 \boxed{
-(I - A)\mathbf{V}^{n+1}
-= (I + A)\mathbf{V}^n
-+ \mathbf{b}
+(I - A)\mathbf{V}^{n+1} = 
+(I + A)\mathbf{V}^n + 
+\mathbf{b}
 }
 $$
 
