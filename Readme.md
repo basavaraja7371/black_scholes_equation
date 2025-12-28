@@ -34,14 +34,16 @@ We now evolve **forward in $\tau$** from $0 \to T$.
 
 ## 2. Initial and Boundary Conditions
 
-### Initial Condition (at $ \tau = 0 $, i.e. maturity)
+### Initial Condition (at $\tau = 0$, i.e. maturity)
 
 - **European Call**
+
 $$
 V(S,0) = \max(S-K,0)
 $$
 
 - **European Put**
+
 $$
 V(S,0) = \max(K-S,0)
 $$
@@ -238,14 +240,16 @@ All interior components are zero.
 
 ## 10. Time-Stepping Algorithm
 
-1. Initialize $ \mathbf{V}^0 $ from payoff
+1. Initialize $\mathbf{V}^0$ from payoff
 2. For each time step $n$:
    - Evaluate boundary values $V_0^n, V_N^n$
    - Assemble boundary vector $\mathbf{b}$
    - Solve
+
      $$
      (I - A)\mathbf{V}^{n+1} = (I + A)\mathbf{V}^n + \mathbf{b}
      $$
+
 3. Reconstruct full solution including boundaries
 
 ---
@@ -263,6 +267,7 @@ V(S,t) =K e^{-r(T-t)} \Phi(-d_2) -S \Phi(-d_1)
 $$
 
 Where, 
+
 $$
 d_1 = \frac{\ln(S/K) + (r + \tfrac{1}{2}\sigma^2)(T-t)}{\sigma\sqrt{T-t}},
 \quad
