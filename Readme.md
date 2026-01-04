@@ -28,7 +28,7 @@ rS \frac{\partial V}{\partial S} -
 rV
 $$
 
-We now evolve **forward in $\tau$** from $0 \to T$.
+I now evolve **forward in $\tau$** from $0 \to T$.
 
 ---
 
@@ -108,7 +108,7 @@ $$
 
 ## 4. Crank–Nicolson Discretization
 
-The Crank–Nicolson scheme averages the spatial operator between time levels $n$ and $n+1$:
+The Crank–Nicolson scheme averages the spatial operator betIen time levels $n$ and $n+1$:
 
 If
 $$\frac{\partial V}{\partial t} = F(t, S, V_s, V_{ss})$$
@@ -275,3 +275,50 @@ $$
 
 
 Used to verify numerical accuracy.
+
+## 12. Monte Carlo Pricing of Black–Scholes Options
+
+I price a European option by Monte Carlo simulation under the **risk-neutral Black–Scholes model**
+
+$$
+dS_t = r S_t\,dt + \sigma S_t\,dW_t
+$$
+
+which has the exact solution
+
+$$
+S_T = S_0 \exp\!\left[\left(r-\tfrac12\sigma^2\right)T
++ \sigma\sqrt{T}\,Z\right], \quad Z\sim\mathcal{N}(0,1).
+$$
+
+The option price is given by the discounted expectation
+
+$$
+V = \mathbb{E}^{\mathbb{Q}}\!\left[e^{-rT}\,\Phi(S_T)\right],
+$$
+
+with payoff
+$$
+V(S_T)=\max(S_T-K,0)\ \text{(call)}, \quad
+V(S_T)=\max(K-S_T,0)\ \text{(put)}.
+$$
+
+Monte Carlo approximates this expectation as
+
+$$
+\hat V_{MC}
+= e^{-rT}\,\frac{1}{N}\sum_{i=1}^N V(S_T^{(i)}).
+$$
+
+By the **Central Limit Theorem**, the estimator is approximately normal, and a
+95% confidence interval is
+
+$$
+\hat V_{MC} \pm 1.96 \times \text{StdErr},
+\quad
+\text{StdErr}=\frac{s}{\sqrt{N}}.
+$$
+
+The simulation is considered correct if the **analytical Black–Scholes price**
+lies within this confidence interval.
+
